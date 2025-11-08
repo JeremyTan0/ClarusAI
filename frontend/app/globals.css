@@ -24,3 +24,43 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+nav {
+  font-size: 18;
+  align-content: center;
+  margin: 0%;
+  padding: 0%;
+}
+
+link {
+    margin: 0px;
+    padding: 0px;
+}
+
+a {
+  margin: 1%;
+  padding: 1%;
+}
+
+p {
+  max-width: 700px;
+  margin: 12px;
+  padding-left: 32px;
+}
+
+
+h1 {
+
+}
+
+h2 {
+  font-size: 25px;
+  margin: 0px, 0px, 0px, 0px;
+  padding: 24px;
+}
+
+h3 {
+  font-size: 18px;
+  margin: 0px, 0px, 1px, 0px;
+  padding-left: 28px;
+}
