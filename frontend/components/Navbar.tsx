@@ -8,7 +8,7 @@ const Navbar = () => {
         justify-around py-5 px-24 border-b border-grey-700 bg-black'>
 
             <Link href= '/' className= 'btn btn-primary transition duration-300 hover:scale-110'>
-            Home
+            Clarus AI
             </Link>
 
             <ul className="flex gap-10 text-lg">
