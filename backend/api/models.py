@@ -9,18 +9,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
-    google_sub = models.CharField(max_length=255, unique=True, null=True, blank=True)
-
+    
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["name"]
 
     def __str__(self):
         return self.email
+
 
 class Stock(models.Model):
     symbol = models.CharField(max_length=10, unique=True)
@@ -32,7 +32,6 @@ class Stock(models.Model):
     industry = models.CharField(max_length=100, blank=True)
     website = models.URLField(blank=True)
     beta = models.FloatField(null=True)
-
 
     def __str__(self):
         return self.symbol
