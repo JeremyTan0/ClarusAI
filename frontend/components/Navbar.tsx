@@ -12,31 +12,30 @@ const Navbar = () => {
             </Link>
 
             <ul className="flex gap-10 text-lg">
+                <Link href='/stocks' 
+                className=" text-gray-300 hover:text-white transition-colors"
+                >
+                    Stocks
+                </Link>
+                
+                <Link href='/contact' 
+                className=" text-gray-300 hover:text-white transition-colors"
+                >
+                    Placeholder
+                </Link>
+
                 <Link href='/about' 
                 className=" text-gray-300 hover:text-white transition-colors"
                 >
                     About
                 </Link>
 
-                <Link href='/stocks' 
+                <Link href='/login'
                 className=" text-gray-300 hover:text-white transition-colors"
                 >
-                    Stocks
-                </Link>
-
-                <Link href='/contact' 
-                className=" text-gray-300 hover:text-white transition-colors"
-                >
-                    Contact
-                </Link>
-
-                <Link href='/other' 
-                className=" text-gray-300 hover:text-white transition-colors"
-                >
-                    Other
+                    Login
                 </Link>
             </ul>
-
         </nav>
     )
 }

@@ -7,7 +7,7 @@ export default function Stocks() {
 
     // Placeholder URL during development
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/stockInfo/Tsla') 
+        fetch('http://127.0.0.1:8000/api/stockInfo/TSLA') 
             .then(res => res.json())
             .then(data => {
                 setStockInfo(data)
