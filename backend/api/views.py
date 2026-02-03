@@ -92,3 +92,41 @@ def get_stock_info(request, ticker):
             "analyst_rating_strong_sell": data.get("AnalystRatingStrongSell"),
             "analyst_target_price": data.get("AnalystTargetPrice")
         })
+
+def get_stock_background(ticker):
+    url = f"https://www.alphavantage.co/query"
+    params = {
+        "function": "OVERVIEW",
+        "symbol": ticker,
+        "apikey": AV_KEY
+    }
+    r = requests.get(url, params=params)
+    data = r.json()
+    return data
+
+
+def get_ai_response(request, ticker):
+
+    # Define Alpha Vantage 
+    alphav_background = get_stock_background(ticker)
+
+    # Configure client and tools to make a call to gemini
+    client = genai.Client()
+
+    # Define investor prompt
+    prompt = [
+        types.Content(
+            role="user", parts=[types.Part(text=f"Based on the stock ticker {ticker}, retrieve information from the following json response and use the information provided to highlight important information for potential investors to know. JSON response: {alphav_background}.")]
+        )
+    ]
+    """print(prompt)"""
+
+    # Send request with function declarations
+    informed_response = client.models.generate_content(
+        model="gemini-3-flash-preview",
+        contents=prompt,
+    )
+
+    return JsonResponse({
+        "response": informed_response.text
+    })
