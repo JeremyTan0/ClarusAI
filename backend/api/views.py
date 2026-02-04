@@ -141,7 +141,6 @@ def dev_get_stock_info(request, ticker):
 
     return JsonResponse(dummy)
 
-
 def get_stock_background(ticker):
     url = f"https://www.alphavantage.co/query"
     params = {
@@ -152,7 +151,6 @@ def get_stock_background(ticker):
     r = requests.get(url, params=params)
     data = r.json()
     return data
-
 
 def get_ai_response(request, ticker):
 
@@ -178,4 +176,115 @@ def get_ai_response(request, ticker):
 
     return JsonResponse({
         "response": informed_response.text
+    })
+
+def search_stock(request):
+    q = request.GET.get("q", "").strip()
+
+    if not q:
+        return JsonResponse({"query": q, "results": []}, status=400)
+
+    url = "https://www.alphavantage.co/query"
+    params = {
+        "function": "SYMBOL_SEARCH",
+        "keywords": q,
+        "apikey": AV_KEY
+    }
+
+    r = requests.get(url, params=params, timeout=10)
+    data = r.json()
+
+    matches = data.get("bestMatches", [])
+
+    results = []
+    for m in matches:
+        results.append({
+            "symbol": m.get("1. symbol"),
+            "name": m.get("2. name"),
+            "type": m.get("3. type"),
+            "region": m.get("4. region"),
+            "marketOpen": m.get("5. marketOpen"),
+            "marketClose": m.get("6. marketClose"),
+            "timezone": m.get("7. timezone"),
+            "currency": m.get("8. currency"),
+            "matchScore": float(m.get("9. matchScore", 0)),
+        })
+
+    results.sort(key=lambda x: x["matchScore"], reverse=True)
+
+    return JsonResponse({"query": q, "results": results})
+
+def dev_stock_search(request):
+    q = request.GET.get("q", "").strip()
+
+    if not q:
+        return JsonResponse({
+            "query": q,
+            "results": [],
+            "error": "Missing query param: ?q="
+        }, status=400)
+
+    q_upper = q.upper()
+
+    results = [
+        {
+            "symbol": q_upper,
+            "name": f"{q_upper} Incorporated",
+            "type": "Equity",
+            "region": "United States",
+            "marketOpen": "09:30",
+            "marketClose": "16:00",
+            "timezone": "UTC-04",
+            "currency": "USD",
+            "matchScore": 1.0,
+        },
+        {
+            "symbol": f"{q_upper}X",
+            "name": f"{q_upper} Growth Fund A",
+            "type": "Mutual Fund",
+            "region": "United States",
+            "marketOpen": "09:30",
+            "marketClose": "16:00",
+            "timezone": "UTC-04",
+            "currency": "USD",
+            "matchScore": 0.88,
+        },
+        {
+            "symbol": f"{q_upper}.LON",
+            "name": f"1x {q_upper} Tracker ETP",
+            "type": "ETF",
+            "region": "United Kingdom",
+            "marketOpen": "08:00",
+            "marketClose": "16:30",
+            "timezone": "UTC+01",
+            "currency": "GBX",
+            "matchScore": 0.80,
+        },
+        {
+            "symbol": f"{q_upper}.TRT",
+            "name": f"{q_upper} CDR (CAD Hedged)",
+            "type": "Equity",
+            "region": "Toronto",
+            "marketOpen": "09:30",
+            "marketClose": "16:00",
+            "timezone": "UTC-05",
+            "currency": "CAD",
+            "matchScore": 0.72,
+        },
+        {
+            "symbol": f"{q_upper}34.SAO",
+            "name": f"{q_upper} Depositary Receipt",
+            "type": "Equity",
+            "region": "Brazil/Sao Paolo",
+            "marketOpen": "10:00",
+            "marketClose": "17:30",
+            "timezone": "UTC-03",
+            "currency": "BRL",
+            "matchScore": 0.61,
+        },
+    ]
+
+    return JsonResponse({
+        "query": q,
+        "results": results
     })
