@@ -17,6 +17,12 @@ const Navbar = () => {
                 >
                     Stocks
                 </Link>
+
+                <Link href={'/search'}
+                className=" text-gray-300 hover:text-white transition-colors"
+                >
+                    Search
+                </Link>
                 
                 <Link href='/contact' 
                 className=" text-gray-300 hover:text-white transition-colors"
