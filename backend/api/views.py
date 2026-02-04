@@ -43,6 +43,7 @@ def hello(request):
 
 def get_stock_info(request, ticker):
     url = f"https://www.alphavantage.co/query"
+    ticker = ticker.upper()
     params = {
         "function": "OVERVIEW",
         "symbol": ticker,
@@ -92,3 +93,89 @@ def get_stock_info(request, ticker):
             "analyst_rating_strong_sell": data.get("AnalystRatingStrongSell"),
             "analyst_target_price": data.get("AnalystTargetPrice")
         })
+
+def dev_get_stock_info(request, ticker):
+    ticker = ticker.upper().strip()
+
+    dummy = {
+        "symbol": ticker,
+        "asset_type": "Common Stock",
+        "name": f"{ticker} Corporation",
+        "description": f"{ticker} is a publicly traded company used for development/testing.",
+        "exchange": "NASDAQ",
+        "currency": "USD",
+        "country": "USA",
+        "sector": "TECHNOLOGY",
+        "industry": "SOFTWARE",
+        "address": "123 DEV STREET, SAN FRANCISCO, CA, USA",
+        "website": "https://example.com",
+
+        "market_cap": "$1.58T",
+        "ebitda": "$10.50B",
+        "pe_ratio": "383.46",
+        "peg_ratio": "6.44",
+        "eps": "$1.10",
+        "book_value": "$21.90",
+
+        "revenue_ttm": "$94.83B",
+        "gross_profit_ttm": "$17.09B",
+
+        "profit_margin": "4.00%",
+        "operating_margin_ttm": "4.70%",
+        "return_on_assets": "2.10%",
+        "return_on_equity": "4.93%",
+
+        "beta": "1.887",
+        "52_week_high": "$498.83",
+        "52_week_low": "$214.25",
+        "50_day_moving_average": "$443.58",
+        "200_day_moving_average": "$377.22",
+
+        "analyst_rating_strong_buy": "4",
+        "analyst_rating_buy": "17",
+        "analyst_rating_hold": "18",
+        "analyst_rating_sell": "6",
+        "analyst_rating_strong_sell": "2",
+        "analyst_target_price": "418.81",
+    }
+
+    return JsonResponse(dummy)
+
+
+def get_stock_background(ticker):
+    url = f"https://www.alphavantage.co/query"
+    params = {
+        "function": "OVERVIEW",
+        "symbol": ticker,
+        "apikey": AV_KEY
+    }
+    r = requests.get(url, params=params)
+    data = r.json()
+    return data
+
+
+def get_ai_response(request, ticker):
+
+    # Define Alpha Vantage 
+    alphav_background = get_stock_background(ticker)
+
+    # Configure client and tools to make a call to gemini
+    client = genai.Client()
+
+    # Define investor prompt
+    prompt = [
+        types.Content(
+            role="user", parts=[types.Part(text=f"Based on the stock ticker {ticker}, retrieve information from the following json response and use the information provided to highlight important information for potential investors to know. JSON response: {alphav_background}.")]
+        )
+    ]
+    """print(prompt)"""
+
+    # Send request with function declarations
+    informed_response = client.models.generate_content(
+        model="gemini-3-flash-preview",
+        contents=prompt,
+    )
+
+    return JsonResponse({
+        "response": informed_response.text
+    })

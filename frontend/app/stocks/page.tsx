@@ -61,7 +61,7 @@ export default function Stocks() {
         setLoading(true)
         setError(null)
 
-        const res = await fetch('http://127.0.0.1:8000/api/stockInfo/Tsla')
+        const res = await fetch('http://127.0.0.1:8000/api/devstockInfo/Tsla')
 
         if (!res.ok) {
           throw new Error(`Request failed: ${res.status}`)
