@@ -14,8 +14,9 @@ export default function about() {
                     <p>
                         This webpage is a simple and easy to learn stock investment website. This website was created
                         the idea that from beginner to expert level of investment, anyone should be able to learn and
-                        figure out how to invest. This website has the abilty to allow users to browse the current
-                        stock market, and
+                        figure out how to invest. This website has the ability to allow users to browse the current
+                        stock market, and utilize AI to help build a summary of the stock to give the user advise on
+                        whether they should invest in the specific stock.
                     </p>
                 </article>
             </main>

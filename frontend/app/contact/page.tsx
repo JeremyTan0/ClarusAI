@@ -5,7 +5,7 @@ export default function stocks() {
     return (
         <div>
             <main>
-                    <h2>Contact Page</h2>
+                    <h2>Placeholder Page</h2>
                     <p>This is a placeholder</p>
             </main>
 

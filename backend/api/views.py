@@ -65,7 +65,6 @@ def hello(request):
 def get_stock_info(request, ticker):
 
     url = f"https://www.alphavantage.co/query"
-    ticker = ticker.upper()
     params = {
         "function": "OVERVIEW",
         "symbol": ticker,
@@ -173,6 +172,7 @@ def get_stock_background(ticker):
     r = requests.get(url, params=params)
     data = r.json()
     return data
+
 
 def get_ai_response(request, ticker):
 
