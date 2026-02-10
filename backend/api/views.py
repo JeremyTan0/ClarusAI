@@ -1,9 +1,30 @@
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import BasicAuthentication
 from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.response import Response
 from django.http import JsonResponse
 from django.conf import settings
 import requests
 from google import genai
 from google.genai import types
+
+from .models import Stock
+from api.serializers import StockSerializer, UserSerializer
+from api.services.stock_service import (
+    create_stock,
+    get_stock_by_symbol,
+    list_stocks,
+    update_stock,
+    delete_stock,
+)
+from api.services.user_service import (
+    create_user,
+    get_user_by_id,
+    update_user_by_id,
+    delete_user_by_id,
+)
 
 AV_KEY = settings.AV_KEY
 
@@ -42,6 +63,7 @@ def hello(request):
     return JsonResponse({"message": "Hello World!"})
 
 def get_stock_info(request, ticker):
+
     url = f"https://www.alphavantage.co/query"
     ticker = ticker.upper()
     params = {
@@ -288,3 +310,92 @@ def dev_stock_search(request):
         "query": q,
         "results": results
     })
+
+# STOCK CRUD
+@api_view(["POST"])
+def create_stock_view(request):
+    stock = create_stock(**request.data)
+    serializer = StockSerializer(stock)
+    return Response(serializer.data, status=201)
+
+@api_view(["GET"])
+def get_stock_view(request, symbol):
+    try:
+        stock = get_stock_by_symbol(symbol)
+    except ObjectDoesNotExist:
+        return Response({"detail": "Stock not found"}, status=404)
+
+    return Response(StockSerializer(stock).data)
+
+
+@api_view(["GET"])
+def list_stocks_view(request):
+    stocks = list_stocks()
+    serializer = StockSerializer(stocks, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["PUT", "PATCH"])
+def update_stock_view(request, symbol):
+    try:
+        stock = get_stock_by_symbol(symbol)
+    except ObjectDoesNotExist:
+        return Response({"detail": "Stock not found"}, status=404)
+
+    stock = update_stock(stock, **request.data)
+    return Response(StockSerializer(stock).data)
+
+
+@api_view(["DELETE"])
+def delete_stock_view(request, symbol):
+    try:
+        stock = get_stock_by_symbol(symbol)
+    except ObjectDoesNotExist:
+        return Response({"detail": "Stock not found"}, status=404)
+
+    delete_stock(stock)
+    return Response(status=204)
+
+
+
+# USERS CRUD
+@api_view(["POST"])
+def register_user(request):
+    user = create_user(request.data)
+    return Response(
+        UserSerializer(user).data,
+        status=201
+    )
+
+@api_view(["GET"])
+def get_user(request, user_id):
+    try:
+        user = get_user_by_id(user_id)
+    except ObjectDoesNotExist:
+        return Response({"detail": "User not found"}, status=404)
+
+    return Response(
+        UserSerializer(user).data
+    )
+
+@api_view(["PUT", "PATCH"])
+def update_user(request, user_id):
+    try:
+        user = get_user_by_id(user_id)
+    except ObjectDoesNotExist:
+        return Response({"detail": "User not found"}, status=404)
+
+    user = update_user_by_id(user, request.data)
+    return Response(
+        UserSerializer(user).data
+    )
+
+@api_view(["DELETE"])
+def delete_user(request, user_id):
+    try:
+        user = get_user_by_id(user_id)
+    except ObjectDoesNotExist:
+        return Response({"detail": "User not found"}, status=404)
+
+    delete_user_by_id(user)
+    return Response(status=204)
