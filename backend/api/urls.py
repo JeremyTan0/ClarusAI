@@ -8,4 +8,5 @@ urlpatterns = [
     path('devstockInfo/<str:ticker>', views.dev_get_stock_info, name='dev_stock_info'),
     path('stockSearch/', views.search_stock, name='stockSearch'),
     path('devstockSearch/', views.dev_stock_search, name='dev_stockSearch'),
+    path('signup/', views.signup, name='signup'),
 ]

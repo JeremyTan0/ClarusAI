@@ -288,3 +288,8 @@ def dev_stock_search(request):
         "query": q,
         "results": results
     })
+
+def signup(request):
+    if request.method == "POST":
+        return JsonResponse({"message": "User signed up successfully!"})
+    return JsonResponse({"message": "Signup endpoint hit!"})
