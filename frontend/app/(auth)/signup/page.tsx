@@ -5,6 +5,7 @@ import { useState } from "react";
 
 export default function SignUpRoute() {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,7 +20,8 @@ export default function SignUpRoute() {
       },
       body: JSON.stringify({
         email,
-        name: username,
+        name,
+        username,
         password,
       }),
     });
@@ -39,6 +41,9 @@ export default function SignUpRoute() {
         <form onSubmit={handleSubmit} className="space-y-4 p-4 rounded-md">
         <label htmlFor="email" className="block m-2 text-black">Email: </label>
           <input type="email" id="email" name="email" className="text-black border border-gray-300 rounded-md p-2" value={email} onChange={(e) => setEmail(e.target.value)} required />
+
+          <label htmlFor="name" className="block m-2 text-black">Name: </label>
+          <input type="text" id="name" name="name" className="text-black border border-gray-300 rounded-md p-2" value={name} onChange={(e) => setName(e.target.value)} required />
 
           <label htmlFor="username" className="block m-2 text-black">Username: </label>
           <input type="text" id="name" name="name" className="text-black border border-gray-300 rounded-md p-2" required />
