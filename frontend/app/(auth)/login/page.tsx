@@ -11,7 +11,7 @@ export default function LoginRoute() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch("http://127.0.0.1:8000/api/login/", {
+    const res = await fetch("http://127.0.0.1:8000/api/<uuid:user_id>/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -12,7 +12,7 @@ export default function SignUpRoute() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch("http://127.0.0.1:8000/api/signup/", {
+    const res = await fetch("http://127.0.0.1:8000/api/users/register/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
