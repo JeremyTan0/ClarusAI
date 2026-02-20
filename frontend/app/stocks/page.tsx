@@ -44,10 +44,15 @@ type StockInfo = {
   analyst_target_price?: string
 }
 
+type GeminiResponse = {
+  summ_response?: string
+}
+
 export default function Stocks() {
   const [stockInfo, setStockInfo] = useState<StockInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [geminiResponse, setAIResponse] = useState<GeminiResponse | null>(null)
 
   const cleanValue = (val: any) => {
     if (val === null || val === undefined) return null
@@ -62,11 +67,18 @@ export default function Stocks() {
         setError(null)
 
         const res = await fetch('http://127.0.0.1:8000/api/devstockInfo/Tsla')
+        const summ = await fetch('http://127.0.0.1:8000/api/aiResponse/tsla')
 
         if (!res.ok) {
           throw new Error(`Request failed: ${res.status}`)
         }
 
+        if (!summ.ok) {
+          throw new Error(`Request failed: ${summ.status}`)
+        }
+
+        const summ_res = await summ.json()
+        setAIResponse(summ_res)
         const data = await res.json()
         setStockInfo(data)
       } catch (err: any) {
@@ -209,6 +221,14 @@ export default function Stocks() {
           <div className="border border-gray-800 rounded-xl bg-white/5 p-4">
             <div className="text-xs text-gray-500 mb-1">Beta</div>
             <div className="text-xl font-bold">{cleanValue(stockInfo.beta) ?? 'N/A'}</div>
+          </div>
+        </div>
+
+        {/* Summary */}
+        <div className="grid grid-cols-1 lg:grid-cols-1 mb-8">
+          <div className="border border-gray-800 rounded-xl bg-white/5 p-4">
+            <h3 className="text-lg font-semibold">Analytical Summary</h3>
+            <div className="text-600">{cleanValue(geminiResponse?.summ_response) ?? 'N/A'}</div>
           </div>
         </div>
 

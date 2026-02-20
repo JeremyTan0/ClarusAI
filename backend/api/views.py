@@ -185,10 +185,9 @@ def get_ai_response(request, ticker):
     # Define investor prompt
     prompt = [
         types.Content(
-            role="user", parts=[types.Part(text=f"Based on the stock ticker {ticker}, retrieve information from the following json response and use the information provided to highlight important information for potential investors to know. JSON response: {alphav_background}.")]
+            role="user", parts=[types.Part(text=f"Based on the stock ticker {ticker}, retrieve information from the following json response and use the information provided to highlight important information for potential investors to know. JSON response: {alphav_background}. Do not include asterisk or pound symbols and start your response with the phrasing: Based on the provided financial data for {ticker} here is a summary of the most important information for potential investors to consider.")]
         )
     ]
-    """print(prompt)"""
 
     # Send request with function declarations
     informed_response = client.models.generate_content(
@@ -197,7 +196,7 @@ def get_ai_response(request, ticker):
     )
 
     return JsonResponse({
-        "response": informed_response.text
+        "summ_response": informed_response.text
     })
 
 def search_stock(request):
