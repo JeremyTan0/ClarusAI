@@ -10,7 +10,7 @@ export default function LoginRoute() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch("http://127.0.0.1:8000/api/users/", {
+    const res = await fetch("http://127.0.0.1:8000/api/users/register/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,10 +36,20 @@ export default function LoginRoute() {
       <h1 className="text-2xl font-bold text-black">Login Route</h1>
       <form onSubmit={handleSubmit} className="space-y-4 p-4 rounded-md">
         <label htmlFor="email" className="block m-2 text-black">Email: </label>
-        <input type="text" id="email" name="email" className="text-black border border-gray-300 rounded-md p-2" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input 
+        type="text" 
+        id="email" 
+        name="email" 
+        className="text-black border border-gray-300 rounded-md p-2" value={email} onChange={(e) => setEmail(e.target.value)} required />
 
         <label htmlFor="password" className="block m-2 text-black">Password: </label>
-        <input type="password" id="password" name="password" className="text-black border border-gray-300 rounded-md p-2" required />
+        <input type="password" 
+        id="password" 
+        name="password" 
+        className="text-black border border-gray-300 rounded-md p-2"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)} 
+        required />
 
         <button type="submit"  className="block  text-black border border-gray-300 rounded-md p-2">Submit</button>
       </form>

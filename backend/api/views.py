@@ -11,7 +11,7 @@ from google import genai
 from google.genai import types
 
 from .models import Stock
-from api.serializers import StockSerializer, UserSerializer
+from api.serializers import StockSerializer, UserSerializer, UserCreateSerializer, UserUpdateSerializer
 from api.services.stock_service import (
     create_stock,
     get_stock_by_symbol,
@@ -25,6 +25,12 @@ from api.services.user_service import (
     update_user_by_id,
     delete_user_by_id,
 )
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+GOOGLE_API_KEY = os.getenv("GEMINI_KEY")
 
 AV_KEY = settings.AV_KEY
 
@@ -180,7 +186,7 @@ def get_ai_response(request, ticker):
     alphav_background = get_stock_background(ticker)
 
     # Configure client and tools to make a call to gemini
-    client = genai.Client()
+    client = genai.Client(api_key=GOOGLE_API_KEY)
 
     # Define investor prompt
     prompt = [
@@ -360,11 +366,14 @@ def delete_stock_view(request, symbol):
 # USERS CRUD
 @api_view(["POST"])
 def register_user(request):
-    user = create_user(request.data)
-    return Response(
-        UserSerializer(user).data,
-        status=201
-    )
+    serializer = UserCreateSerializer(data=request.data)
+
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response(UserSerializer(user).data, status=201)
+
+    return Response(serializer.errors, status=400)
+
 
 @api_view(["GET"])
 def get_user(request, user_id):
@@ -377,17 +386,18 @@ def get_user(request, user_id):
         UserSerializer(user).data
     )
 
+
 @api_view(["PUT", "PATCH"])
 def update_user(request, user_id):
-    try:
-        user = get_user_by_id(user_id)
-    except ObjectDoesNotExist:
-        return Response({"detail": "User not found"}, status=404)
+    user = get_user_by_id(user_id)
+    serializer = UserUpdateSerializer(user, data=request.data, partial=True)
 
-    user = update_user_by_id(user, request.data)
-    return Response(
-        UserSerializer(user).data
-    )
+    if serializer.is_valid():
+        serializer.save()
+        return Response(UserSerializer(user).data)
+
+    return Response(serializer.errors, status=400)
+
 
 @api_view(["DELETE"])
 def delete_user(request, user_id):
