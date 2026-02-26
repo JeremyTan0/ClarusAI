@@ -11,7 +11,18 @@ from google import genai
 from google.genai import types
 
 from .models import Stock
-from api.serializers import StockSerializer, UserSerializer, UserCreateSerializer, UserUpdateSerializer
+from api.serializers import StockSerializer, UserSerializer, UserCreateSerializer, UserUpdateSerializer, EmailTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = "email"
+
+
+class EmailTokenObtainPairView(TokenObtainPairView):
+    serializer_class = EmailTokenObtainPairSerializer
+
 from api.services.stock_service import (
     create_stock,
     get_stock_by_symbol,
@@ -408,3 +419,4 @@ def delete_user(request, user_id):
 
     delete_user_by_id(user)
     return Response(status=204)
+

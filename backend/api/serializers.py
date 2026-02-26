@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from api.models import Stock, User
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class StockSerializer(serializers.ModelSerializer):
@@ -29,3 +30,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["name"]
+
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = "email"
