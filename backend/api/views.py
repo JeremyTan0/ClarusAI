@@ -11,7 +11,18 @@ from google import genai
 from google.genai import types
 
 from .models import Stock
-from api.serializers import StockSerializer, UserSerializer
+from api.serializers import StockSerializer, UserSerializer, UserCreateSerializer, UserUpdateSerializer, EmailTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = "email"
+
+
+class EmailTokenObtainPairView(TokenObtainPairView):
+    serializer_class = EmailTokenObtainPairSerializer
+
 from api.services.stock_service import (
     create_stock,
     get_stock_by_symbol,
@@ -25,6 +36,12 @@ from api.services.user_service import (
     update_user_by_id,
     delete_user_by_id,
 )
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+GOOGLE_API_KEY = os.getenv("GEMINI_KEY")
 
 AV_KEY = settings.AV_KEY
 
@@ -180,15 +197,14 @@ def get_ai_response(request, ticker):
     alphav_background = get_stock_background(ticker)
 
     # Configure client and tools to make a call to gemini
-    client = genai.Client()
+    client = genai.Client(api_key=GOOGLE_API_KEY)
 
     # Define investor prompt
     prompt = [
         types.Content(
-            role="user", parts=[types.Part(text=f"Based on the stock ticker {ticker}, retrieve information from the following json response and use the information provided to highlight important information for potential investors to know. JSON response: {alphav_background}.")]
+            role="user", parts=[types.Part(text=f"Based on the stock ticker {ticker}, retrieve information from the following json response and use the information provided to highlight important information for potential investors to know. JSON response: {alphav_background}. Do not include asterisk or pound symbols and start your response with the phrasing: Based on the provided financial data for {ticker} here is a summary of the most important information for potential investors to consider.")]
         )
     ]
-    """print(prompt)"""
 
     # Send request with function declarations
     informed_response = client.models.generate_content(
@@ -197,7 +213,7 @@ def get_ai_response(request, ticker):
     )
 
     return JsonResponse({
-        "response": informed_response.text
+        "summ_response": informed_response.text
     })
 
 def search_stock(request):
@@ -361,11 +377,14 @@ def delete_stock_view(request, symbol):
 # USERS CRUD
 @api_view(["POST"])
 def register_user(request):
-    user = create_user(request.data)
-    return Response(
-        UserSerializer(user).data,
-        status=201
-    )
+    serializer = UserCreateSerializer(data=request.data)
+
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response(UserSerializer(user).data, status=201)
+
+    return Response(serializer.errors, status=400)
+
 
 @api_view(["GET"])
 def get_user(request, user_id):
@@ -378,17 +397,18 @@ def get_user(request, user_id):
         UserSerializer(user).data
     )
 
+
 @api_view(["PUT", "PATCH"])
 def update_user(request, user_id):
-    try:
-        user = get_user_by_id(user_id)
-    except ObjectDoesNotExist:
-        return Response({"detail": "User not found"}, status=404)
+    user = get_user_by_id(user_id)
+    serializer = UserUpdateSerializer(user, data=request.data, partial=True)
 
-    user = update_user_by_id(user, request.data)
-    return Response(
-        UserSerializer(user).data
-    )
+    if serializer.is_valid():
+        serializer.save()
+        return Response(UserSerializer(user).data)
+
+    return Response(serializer.errors, status=400)
+
 
 @api_view(["DELETE"])
 def delete_user(request, user_id):
@@ -399,3 +419,4 @@ def delete_user(request, user_id):
 
     delete_user_by_id(user)
     return Response(status=204)
+

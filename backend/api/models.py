@@ -22,6 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
+
 class Stock(models.Model):
     symbol = models.CharField(max_length=10, unique=True)
     name = models.CharField(max_length=255)
