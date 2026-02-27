@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginRoute() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,13 +23,22 @@ export default function LoginRoute() {
       }),
     });
 
-    if (!res.ok) {
+    if (res.ok) {
+      console.log("Login successful");
+
+      const data = await res.json();
+      localStorage.setItem("access", data.access);
+      localStorage.setItem("refresh", data.refresh);
+
+      router.push("/dashboard");
+    } 
+    else {
       const err = await res.json();
       console.error(err);
-      return;
+      return
     }
 
-    console.log("Login successful");
+    
   };
 
   return (
@@ -51,7 +62,7 @@ export default function LoginRoute() {
         onChange={(e) => setPassword(e.target.value)} 
         required />
 
-        <button type="submit"  className="block  text-black border border-gray-300 rounded-md p-2">Submit</button>
+        <button type="submit" className="block  text-black border border-gray-300 rounded-md p-2">Submit</button>
       </form>
       <Link href="/signup" className="text-blue-500 underline mt-4 block">
         Don't have an account? SignUp
