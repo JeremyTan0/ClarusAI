@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignUpRoute() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,13 +28,20 @@ export default function SignUpRoute() {
       }),
     });
 
-    if (!res.ok) {
+    if (res.ok) {
+    console.log("Signup successful");
+
+    const data = await res.json();
+    localStorage.setItem("access", data.access);
+    localStorage.setItem("refresh", data.refresh);
+
+    router.push("/dashboard");
+    } else {
       const err = await res.json();
       console.error(err);
-      return;
+      return
     }
 
-    console.log("Signup successful");
   };
   return (
     <div className="flex items-center justify-center font-sans">
